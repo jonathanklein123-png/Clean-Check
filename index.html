@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>CleanCheck QA</title>
+<style>
+  :root {
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --blue-light: #dbeafe;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --yellow: #f59e0b;
+    --yellow-light: #fef3c7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+    min-height: 100vh;
+    color: var(--gray-800);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: white;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 44px; height: 44px;
+    background: var(--blue);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo svg { width: 26px; height: 26px; }
+  .header-title { font-size: 18px; font-weight: 700; color: var(--gray-800); }
+  .header-sub { font-size: 12px; color: var(--gray-400); }
+
+  .lang-toggle {
+    display: flex;
+    background: var(--gray-100);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--gray-200);
+  }
+  .lang-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--gray-500);
+    transition: all 0.2s;
+  }
+  .lang-btn.active {
+    background: var(--blue);
+    color: white;
+  }
+
+  /* ── Container ── */
+  .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+  /* ── Cards ── */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray-700);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon { font-size: 20px; }
+
+  /* ── Step Indicator ── */
+  .steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 16px 20px;
+  }
+  .step-dot {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+    background: var(--gray-200);
+    color: var(--gray-400);
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+  .step-dot.active { background: var(--blue); color: white; transform: scale(1.15); }
+  .step-dot.done { background: var(--green); color: white; }
+  .step-line {
+    height: 3px;
+    width: 40px;
+    background: var(--gray-200);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .step-line.done { background: var(--green); }
+
+  /* ── Inputs ── */
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-500);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    background: white;
+    color: var(--gray-800);
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+  .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+  }
+
+  /* ── Area Grid ── */
+  .area-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .area-card {
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 18px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .area-card:active { transform: scale(0.97); }
+  .area-card.completed { border-color: var(--green); background: var(--green-light); }
+  .area-card.in-progress { border-color: var(--yellow); background: var(--yellow-light); }
+  .area-icon { font-size: 32px; margin-bottom: 8px; display: block; }
+  .area-name { font-size: 14px; font-weight: 600; color: var(--gray-700); line-height: 1.3; }
+  .area-status {
+    font-size: 11px;
+    margin-top: 6px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+  .area-status.done { background: var(--green); color: white; }
+  .area-status.partial { background: var(--yellow); color: white; }
+  .area-status.empty { background: var(--gray-200); color: var(--gray-500); }
+  .area-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 28px; height: 28px;
+    background: var(--green);
+    color: white;
+    border-radius: 50%;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.3);
+  }
+
+  /* ── Checklist Items ── */
+  .checklist-item {
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .checklist-item.rated-good { border-color: #86efac; background: #f0fdf4; }
+  .checklist-item.rated-ok { border-color: #fde68a; background: #fffbeb; }
+  .checklist-item.rated-bad { border-color: #fca5a5; background: #fef2f2; }
+  .item-name { font-size: 15px; font-weight: 600; color: var(--gray-700); margin-bottom: 10px; }
+  .item-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 24px;
+    background: var(--blue-light);
+    color: var(--blue);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ── Star Rating ── */
+  .stars { display: flex; gap: 6px; margin-bottom: 10px; }
+  .star-btn {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    border: 2px solid var(--gray-200);
+    background: white;
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .star-btn:active { transform: scale(0.9); }
+  .star-btn.filled {
+    background: #fef3c7;
+    border-color: #f59e0b;
+  }
+  .star-label {
+    font-size: 11px;
+    text-align: center;
+    color: var(--gray-400);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  /* ── Comment & Photo ── */
+  .comment-input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    resize: none;
+    font-family: inherit;
+    min-height: 48px;
+    transition: border-color 0.2s;
+  }
+  .comment-input:focus { outline: none; border-color: var(--blue); }
+
+  .photo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--gray-100);
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s;
+  }
+  .photo-btn:active { background: var(--gray-200); }
+  .photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .photo-thumb {
+    width: 72px; height: 72px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid var(--gray-200);
+    position: relative;
+  }
+  .photo-wrap { position: relative; display: inline-block; }
+  .photo-remove {
+    position: absolute;
+    top: -6px; right: -6px;
+    width: 22px; height: 22px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Building Search Picker ── */
+  .search-picker { position: relative; }
+  .search-input-wrap {
+    position: relative;
+  }
+  .search-input-wrap .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    pointer-events: none;
+  }
+  .search-input {
+    width: 100%;
+    padding: 14px 16px 14px 42px;
+    font-size: 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    background: white;
+    color: var(--gray-800);
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { outline: none; border-color: var(--blue); }
+  .search-input::placeholder { color: var(--gray-400); }
+  .search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 50;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .search-group-label {
+    padding: 10px 14px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--blue-light);
+    position: sticky;
+    top: 0;
+  }
+  .search-result-item {
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--gray-700);
+    cursor: pointer;
+    border-bottom: 1px solid var(--gray-100);
+    transition: background 0.15s;
+  }
+  .search-result-item:hover, .search-result-item:active {
+    background: var(--blue-light);
+  }
+  .search-result-item .addr { font-weight: 600; }
+  .search-result-item .cust { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+  .search-no-results {
+    padding: 20px 14px;
+    text-align: center;
+    color: var(--gray-400);
+    font-size: 14px;
+  }
+  .selected-building {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--green-light);
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .selected-building .sel-customer { font-size: 13px; font-weight: 700; color: var(--green); }
+  .selected-building .sel-address { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-top: 2px; }
+  .selected-building .sel-change { font-size: 12px; color: var(--blue); font-weight: 600; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: var(--blue-dark); }
+  .btn-primary:disabled { background: var(--gray-300); cursor: default; }
+  .btn-success { background: var(--green); color: white; }
+  .btn-outline {
+    background: white;
+    color: var(--gray-700);
+    border: 2px solid var(--gray-300);
+  }
+  .btn-outline:hover { background: var(--gray-50); }
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-row .btn { flex: 1; }
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+
+  /* ── Progress Bar ── */
+  .progress-wrap { margin-bottom: 4px; }
+  .progress-bar {
+    height: 10px;
+    background: var(--gray-200);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease, background 0.3s;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--gray-500);
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  /* ── Review ── */
+  .score-big {
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--blue);
+    text-align: center;
+    line-height: 1;
+  }
+  .score-label {
+    text-align: center;
+    font-size: 14px;
+    color: var(--gray-400);
+    margin-top: 4px;
+  }
+  .review-area {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .review-area:last-child { border-bottom: none; }
+  .review-area-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .review-area-name {
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 15px;
+  }
+  .review-score {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .review-score.good { background: var(--green-light); color: var(--green); }
+  .review-score.ok { background: var(--yellow-light); color: var(--yellow); }
+  .review-score.bad { background: var(--red-light); color: var(--red); }
+  .review-score.none { background: var(--gray-100); color: var(--gray-400); }
+
+  .review-items { margin-top: 8px; }
+  .review-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--gray-500);
+  }
+  .review-item-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  /* ── Success Screen ── */
+  .success-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    text-align: center;
+    padding: 20px;
+  }
+  .success-icon {
+    width: 100px; height: 100px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-size: 48px;
+  }
+
+  /* ── Settings Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-content {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 600px;
+    padding: 24px 20px 32px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-handle {
+    width: 40px; height: 5px;
+    background: var(--gray-300);
+    border-radius: 10px;
+    margin: 0 auto 16px;
+  }
+
+  /* ── Misc ── */
+  .divider { height: 1px; background: var(--gray-200); margin: 16px 0; }
+  .text-center { text-align: center; }
+  .text-muted { color: var(--gray-400); font-size: 13px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-16 { margin-bottom: 16px; }
+  .hidden { display: none !important; }
+
+  .help-box {
+    background: var(--blue-light);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--blue-dark);
+    line-height: 1.5;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .help-box .icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray-800);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 300;
+    animation: fadeInUp 0.3s ease;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  TRANSLATIONS  —  English / Spanish
+// ══════════════════════════════════════════════════
+const T = {
+  en: {
+    appName: "CleanCheck QA",
+    appSub: "Cleaning Audit Inspector",
+    step1: "Info",
+    step2: "Inspect",
+    step3: "Review",
+    // Step 1
+    auditInfo: "Audit Information",
+    buildingLabel: "Building",
+    buildingPlaceholder: "Search by name or address...",
+    buildingChange: "Tap to change",
+    buildingNoResults: "No buildings found. Try a different search.",
+    inspectorLabel: "Inspector Name",
+    inspectorPlaceholder: "Select inspector...",
+    dateLabel: "Audit Date",
+    helpStep1: "Select the building, enter your name, and tap Continue to start the inspection.",
+    continue: "Continue",
+    // Step 2
+    selectArea: "Select an Area to Inspect",
+    helpStep2: "Tap an area to begin inspecting it. A green checkmark means all items are rated.",
+    progress: "Overall Progress",
+    of: "of",
+    items: "items rated",
+    reviewAudit: "Review Audit",
+    notStarted: "Not started",
+    started: "Started",
+    complete: "Complete",
+    back: "Back",
+    // Checklist
+    rateItem: "Rate this item",
+    addComment: "Add a comment (optional)...",
+    addPhoto: "Add Photo",
+    poor: "Poor",
+    fair: "Fair",
+    good: "Good",
+    vGood: "Very Good",
+    excellent: "Excellent",
+    item: "Item",
+    doneWithArea: "Done with this Area",
+    nextItem: "Next Item",
+    prevItem: "Previous Item",
+    // Step 3 - Review
+    auditReview: "Audit Summary",
+    overallScore: "Overall Score",
+    overallComments: "Overall Comments",
+    overallCommentsPlaceholder: "Add any general notes about the building...",
+    overallPhotos: "Overall Photos",
+    submitToSheets: "Submit to Google Sheets",
+    downloadCSV: "Download CSV",
+    submitting: "Submitting...",
+    editAudit: "Edit Audit",
+    pass: "Pass",
+    needsAttention: "Needs Attention",
+    notRated: "Not Rated",
+    // Success
+    auditSubmitted: "Audit Submitted!",
+    startNew: "Start New Audit",
+    // Settings
+    settings: "Settings",
+    sheetsUrl: "Google Sheets Web App URL",
+    sheetsHelp: "Paste the URL from your Google Apps Script deployment to enable direct submission.",
+    close: "Close",
+    // Areas
+    areas: {
+      "lobby": "Lobby",
+      "restrooms": "Restrooms",
+      "offices": "Offices",
+      "breakroom": "Break Room / Kitchen",
+      "hallways": "Hallways",
+      "stairwells": "Stairwells",
+      "elevators": "Elevators",
+      "conference": "Conference Rooms"
+    }
+  },
+  es: {
+    appName: "CleanCheck QA",
+    appSub: "Inspector de Auditoría de Limpieza",
+    step1: "Info",
+    step2: "Inspección",
+    step3: "Revisión",
+    auditInfo: "Información de Auditoría",
+    buildingLabel: "Edificio",
+    buildingPlaceholder: "Buscar por nombre o dirección...",
+    buildingChange: "Toque para cambiar",
+    buildingNoResults: "No se encontraron edificios. Intente otra búsqueda.",
+    inspectorLabel: "Nombre del Inspector",
+    inspectorPlaceholder: "Seleccione inspector...",
+    dateLabel: "Fecha de Auditoría",
+    helpStep1: "Seleccione el edificio, ingrese su nombre y toque Continuar para comenzar la inspección.",
+    continue: "Continuar",
+    selectArea: "Seleccione un Área para Inspeccionar",
+    helpStep2: "Toque un área para comenzar a inspeccionarla. Una marca verde significa que todos los elementos están calificados.",
+    progress: "Progreso General",
+    of: "de",
+    items: "elementos calificados",
+    reviewAudit: "Revisar Auditoría",
+    notStarted: "Sin iniciar",
+    started: "Iniciado",
+    complete: "Completo",
+    back: "Atrás",
+    rateItem: "Califique este elemento",
+    addComment: "Agregar comentario (opcional)...",
+    addPhoto: "Agregar Foto",
+    poor: "Malo",
+    fair: "Regular",
+    good: "Bueno",
+    vGood: "Muy Bueno",
+    excellent: "Excelente",
+    item: "Elemento",
+    doneWithArea: "Terminar esta Área",
+    nextItem: "Siguiente",
+    prevItem: "Anterior",
+    auditReview: "Resumen de Auditoría",
+    overallScore: "Puntuación General",
+    overallComments: "Comentarios Generales",
+    overallCommentsPlaceholder: "Agregue notas generales sobre el edificio...",
+    overallPhotos: "Fotos Generales",
+    submitToSheets: "Enviar a Google Sheets",
+    downloadCSV: "Descargar CSV",
+    submitting: "Enviando...",
+    editAudit: "Editar Auditoría",
+    pass: "Aprobado",
+    needsAttention: "Necesita Atención",
+    notRated: "Sin Calificar",
+    auditSubmitted: "¡Auditoría Enviada!",
+    startNew: "Nueva Auditoría",
+    settings: "Configuración",
+    sheetsUrl: "URL de Google Sheets Web App",
+    sheetsHelp: "Pegue la URL de su Google Apps Script para habilitar el envío directo.",
+    close: "Cerrar",
+    areas: {
+      "lobby": "Vestíbulo",
+      "restrooms": "Baños",
+      "offices": "Oficinas",
+      "breakroom": "Sala de Descanso / Cocina",
+      "hallways": "Pasillos",
+      "stairwells": "Escaleras",
+      "elevators": "Elevadores",
+      "conference": "Salas de Conferencia"
+    }
+  }
+};
+
+// ══════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════
+const BUILDINGS_BY_CUSTOMER = {
+  "Abbott Valley Veterinary Ctr": ["4232 Diamond Hill Rd, Cumberland"],
+  "Attleboro Enterprises, Inc": ["284 John Dietsch Boulevard, North Attleboro","Mansfield Redemption Center - 75 Forbes Blvd, Mansfield","Mansfield Connection - 75 Forbes Blvd, Mansfield","Dighton Redemption Center - 1901 County St, Dighton"],
+  "Baby Delight": ["582 Great Rd, Smithfield"],
+  "Berkeley Business Center": ["30 Martin St, Suite 3C, Cumberland"],
+  "Blackstone Auto Body": ["12 Ann & Hope Way, Cumberland"],
+  "Boston IVF": ["148 West River St, Suite 6, Providence"],
+  "Bristol County Savings Bank": ["215 Armistice Blvd, Pawtucket","5 Exchange St, Providence","359 Broad Street, Providence"],
+  "Centre Court Tennis & Pickleball Club": ["55 Hospital Road, Riverside RI 02915"],
+  "Coastal 1 Credit Union": ["571 Smithfield Ave, Pawtucket","1617 Mineral Spring Ave, North Providence","339 Newport Ave, East Providence","540 Broadway, Pawtucket","379 Putnam Pike, Smithfield","405 Warwick Ave, Warwick","660 Warren Ave, East Providence","96 Independence Dr, Cranston","1200 Central Ave, Pawtucket","5661 Post Rd, East Greenwich","3319 Post Rd, Warwick","40 Sockanosset Crossroads, Cranston","221 Tower Hill Rd, North Kingstown","1855 Mendon Rd, Cumberland","576 Metacom Ave, Bristol","1091 Central Ave, Pawtucket","84 Old Tower Hill, Wakefield","457 Angel St, Providence","99 Chestnut St, North Attleboro","1463 Atwood Ave, Johnston"],
+  "Coastal | Allegiance Trucks": ["17 O'Keefee Lane, Warwick"],
+  "Cumberland Water Dept": ["98 Nate Whipple Hwy, Cumberland"],
+  "Curamedix": ["40 Albion Rd, Suite 101, Lincoln"],
+  "Diversified Maintenance": ["Johnson Controls - 6 Blackstone Valley Pl #202, Lincoln"],
+  "EGMP 146-148": ["Common Areas - 148 West River St, Providence","State of RI - 148 West River St, Providence","Dr Ley - 148 West River St, Providence","Security - 148 West River St, Providence"],
+  "Gannon, Bailey & Votolato": ["700 Narragansett Park Dr, Pawtucket"],
+  "Gateway": ["65 Beach St, Westerly"],
+  "Granger Lynch Corp": ["18 Mccracken Rd, Millbury"],
+  "Greater Prov Board of Realtors": ["1169 Park Ave, Cranston"],
+  "Greenwood Emergency Vehicles": ["530 John Dietch Blvd, Attleboro Falls"],
+  "Henry Gonsalves Company": ["35 Thurber Blvd, Smithfield"],
+  "Hope Valley Industries": ["13 Powder Hill Rd, Lincoln","8 Court Dr, Lincoln - Bathrooms","3 Crown Mark Dr, Lincoln"],
+  "J.H. Lynch": ["50 Lynch Pl, Cumberland"],
+  "Keller North America, Inc": ["30 Martin St, Suite 4A, Cumberland","9 Whipple St #1, Cumberland"],
+  "Kerry/Island Oasis": ["131 Norfolk St, Walpole"],
+  "Lafayette Masonic Temple Assoc": ["680 Nate Whipple Hwy, Cumberland"],
+  "Lifespan": ["79 Plain St, Providence","950 Warren Ave, East Providence","117 Ellenfield","195 Collyer St","208 Collyer St","55 Claverick St","OBGYN - 6 Whipple St, North Attleboro","Urgent Care - 66 Branch Ave","Dialysis - 117 Chapman St","Pharmacy - 717 Allens","Bradley School - 130 Broadway","Solutions - Bradley School - 22 Maple Ave, Uncasville","Property Mgmt - 765 Allens Ave, Providence","690 Eddy St","711 Main St","407 East Ave","111 Plain St","20 Southwest Ave, Jamestown","Infusion Center - 1454 South County Trail, East Greenwich","69 Turnpike Ave","77 Turnpike Ave","2820 East Main Rd, Portsmouth","Lab - 594 Great Rd, North Smithfield","Urgent Care - 17 Airport Rd, Warwick","Urgent Care - 1360 West Main Rd, Middletown","Pharmacy - 180 Corliss St","225 Carolina Ave","Urgent Care - 11 Commerce Way, Johnston","Maintenance Office - 90 Royal Little Dr, Providence","Recovery Center - 200 Corliss St","Home Medical - 200 Corliss St","146/148 West River St - Adult Outpatient Services Ste 11B","146/148 West River St - Suite 11A","146/148 West River St - Suite 1F","146/148 West River St - 1st floor Suite 2B","146/148 West River St - Woman's Medical Collaborative Ste 11C","146/148 West River St - Suite 11D","146/148 West River St - Mid Wife 5A","146/148 West River St - Pelvic Rehab Suite 1D 2nd flr","146/148 West River St - OBGYN Suite 8","146/148 West River St - Suite 2B","146/148 West River St - Total","146/148 West River St - Lab","146/148 West River St - Suite 1L","146/148 West River St - Suite 7","146/148 West River St - Suite 1G, 4A, 6B, 1K, 1H, 4B","7211 Post Road, North Kingstown","1838 Kingstown Rd, South Kingstown","236 County Road, Barrington, RI 02806","TMH Cardiac - 208 Collyer St, Providence","58 Amaral Street, Riverside RI"],
+  "M Events Meeting Technologies": ["30 Martin St, Suite 3B, Cumberland"],
+  "Mackland's Realty, Inc": ["573 Mendon Rd, Suite #1, Cumberland"],
+  "McLaughlin Research Corp": ["132 Johnny Cake Hill Road, Middletown","300 High Point Ave, Portsmouth"],
+  "NN, Inc": ["48 Frank Mossberg Dr Building 2, Attleboro, MA 02703","49 Frank Mossberg Dr Building 2, Attleboro, MA 02703"],
+  "Navigant Credit Union": ["560 Main St, Warren","3 Crescent View Ave, Riverside","1041 Ten Rod Road, North Kingstown, RI 02852","172 Main Street, South Kingstown, RI 02879","2100 Warwick Ave, Warwick, RI 02889","800 Post Road, Warwick, RI 02888","48 Franklin Street, Westerly, RI 02891","200 Phenix Avenue, Cranston, RI 02920","563 Main Street, East Greenwich, RI 02818","2300 New London Turnpike, East Greenwich, RI 02818"],
+  "P.K. Lamb Properties, Inc": ["160 Pine St, Providence"],
+  "Phantom Farms": ["2920 Diamond Hill Road"],
+  "Pin Machine": ["30 Martin St 2B"],
+  "Planned Parenthood": ["175 Broad St, Providence"],
+  "RI Builders Association": ["450 Veterans Parkway, East Providence"],
+  "RI Ear, Nose and Throat, Inc": ["148 West River St, Suite 2A, Providence"],
+  "RI Medical Imaging": ["41 Sanderson Rd #109, Smithfield","250 Toll Gate Rd, Warwick","1526 Atwood Ave, Lower Level, Johnston","450 Veterans Memorial Pkwy, Building #2 Suite 203, East Providence","1301 Reservoir Ave, Cranston","1351 S. County Trail, Building #1 Lower Level, East Greenwich","6 Blackstone Valley Pl, Building 5 Suite 506, Lincoln","1500 Mineral Spring Ave, North Providence","65 Sockanosett Rd, Cranston","1539 Atwood Ave, Johnston","481 Kingstown Rd, Wakefield","1 Randall Square, Providence","333 School St, Pawtucket","407 East Ave, Pawtucket"],
+  "RTX BBN Technologies, Inc": ["127 John Clarke Rd, Middletown"],
+  "Rosewood Estate": ["185 Manville Hill Rd, Cumberland"],
+  "Safelite Auto Glass": ["100 Bay State Ave, Warwick","397 Washington St, Attleboro"],
+  "Shawmut Design & Construction": ["3 Davol Square #A275, Providence"],
+  "Sulivan & McLaughlin": ["50 Minnesota Ave, Warwick"],
+  "Tennis Rhode Island": ["70 Boyd Ave, East Providence"],
+  "The Office of Children, Youth & Learning": ["1464 Diamond Hill Rd, Cumberland","Saturday Cleaning - 1464 Diamond Hill Rd, Cumberland"],
+  "Thyssenkrupp": ["279 Jenckes Hill Road, Smithfield"],
+  "Town of East Greenwich": ["Police Station - 176 First Ave, East Greenwich"],
+  "Town of Seekonk": ["Senior Center - 546 Arcade Ave, Seekonk","Fire Dept - 500 Taunton Ave, Seekonk","Public Library - 410 Newman Ave, Seekonk","Town Hall - 100 Peck St, Seekonk","Police Dept - 500 Taunton Ave, Seekonk"],
+  "Veolia": ["85 Branch St, Pawtucket","87 Branch St, Pawtucket","300 Jillson Ave, Woonsocket"],
+  "WJAR": ["23 Kenney Dr, Cranston"],
+  "Whelan Corrente": ["127 John Clarke Rd, Middletown"]
+};
+
+// Flatten into a searchable list: "Customer — Address"
+const BUILDINGS = [];
+Object.entries(BUILDINGS_BY_CUSTOMER).forEach(([cust, addrs]) => {
+  addrs.forEach(addr => BUILDINGS.push({ customer: cust, address: addr, label: cust + " — " + addr }));
+});
+
+const AREA_ICONS = {
+  lobby: "🏢", restrooms: "🚻", offices: "💼", breakroom: "☕",
+  hallways: "🚶", stairwells: "🪜", elevators: "🛗", conference: "📊"
+};
+
+const CHECKLIST_DATA = {
+  lobby: {
+    en: [
+      "Floors mopped and free of debris",
+      "Entrance glass doors cleaned",
+      "Reception desk wiped and sanitized",
+      "Trash cans emptied and liners replaced",
+      "Furniture dusted and arranged",
+      "Light fixtures clean and functional"
+    ],
+    es: [
+      "Pisos trapeados y sin escombros",
+      "Puertas de vidrio de entrada limpias",
+      "Escritorio de recepción limpio y desinfectado",
+      "Botes de basura vaciados y bolsas reemplazadas",
+      "Muebles sacudidos y ordenados",
+      "Lámparas limpias y funcionando"
+    ]
+  },
+  restrooms: {
+    en: [
+      "Toilets and urinals cleaned and sanitized",
+      "Sinks and counters wiped down",
+      "Mirrors streak-free",
+      "Soap, paper towels, and toilet paper stocked",
+      "Floors mopped and drains clear",
+      "Trash cans emptied and liners replaced",
+      "Air freshener working / pleasant smell"
+    ],
+    es: [
+      "Inodoros y urinarios limpios y desinfectados",
+      "Lavabos y mostradores limpiados",
+      "Espejos sin manchas",
+      "Jabón, toallas de papel y papel higiénico abastecidos",
+      "Pisos trapeados y drenajes despejados",
+      "Botes de basura vaciados y bolsas reemplazadas",
+      "Ambientador funcionando / olor agradable"
+    ]
+  },
+  offices: {
+    en: [
+      "Desks and surfaces dusted",
+      "Trash cans emptied",
+      "Floors vacuumed or mopped",
+      "Windows and glass partitions cleaned",
+      "Light switches and door handles sanitized"
+    ],
+    es: [
+      "Escritorios y superficies sacudidos",
+      "Botes de basura vaciados",
+      "Pisos aspirados o trapeados",
+      "Ventanas y divisiones de vidrio limpias",
+      "Interruptores y manijas de puertas desinfectados"
+    ]
+  },
+  breakroom: {
+    en: [
+      "Countertops wiped and sanitized",
+      "Sink cleaned and free of dishes",
+      "Appliance exteriors wiped down",
+      "Tables and chairs cleaned",
+      "Floors mopped",
+      "Trash and recycling emptied"
+    ],
+    es: [
+      "Encimeras limpiadas y desinfectadas",
+      "Fregadero limpio y sin platos",
+      "Exteriores de electrodomésticos limpiados",
+      "Mesas y sillas limpiadas",
+      "Pisos trapeados",
+      "Basura y reciclaje vaciados"
+    ]
+  },
+  hallways: {
+    en: [
+      "Floors mopped / vacuumed",
+      "Baseboards dusted",
+      "Light fixtures clean",
+      "Wall marks or scuffs addressed",
+      "Fire extinguisher areas clear"
+    ],
+    es: [
+      "Pisos trapeados / aspirados",
+      "Zócalos sacudidos",
+      "Lámparas limpias",
+      "Marcas o rayones en paredes atendidos",
+      "Áreas de extintores despejadas"
+    ]
+  },
+  stairwells: {
+    en: [
+      "Steps swept and mopped",
+      "Handrails wiped down",
+      "Landings clear of debris",
+      "Light fixtures functional"
+    ],
+    es: [
+      "Escalones barridos y trapeados",
+      "Pasamanos limpiados",
+      "Descansos despejados de escombros",
+      "Lámparas funcionando"
+    ]
+  },
+  elevators: {
+    en: [
+      "Floor cleaned",
+      "Walls and panels wiped",
+      "Buttons and surfaces sanitized",
+      "Tracks and door edges clean",
+      "Mirror / steel polished (if applicable)"
+    ],
+    es: [
+      "Piso limpio",
+      "Paredes y paneles limpiados",
+      "Botones y superficies desinfectados",
+      "Rieles y bordes de puertas limpios",
+      "Espejo / acero pulido (si aplica)"
+    ]
+  },
+  conference: {
+    en: [
+      "Tables wiped and sanitized",
+      "Chairs cleaned and arranged",
+      "Whiteboard / screen cleaned",
+      "Floors vacuumed",
+      "Trash emptied",
+      "AV equipment dusted"
+    ],
+    es: [
+      "Mesas limpiadas y desinfectadas",
+      "Sillas limpiadas y ordenadas",
+      "Pizarrón / pantalla limpiados",
+      "Pisos aspirados",
+      "Basura vaciada",
+      "Equipo audiovisual sacudido"
+    ]
+  }
+};
+
+const AREA_KEYS = Object.keys(CHECKLIST_DATA);
+
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+let state = {
+  lang: "en",
+  step: 1,        // 1=info, 2=areas, 3=review, 4=success
+  building: "",
+  buildingCustomer: "",
+  buildingSearch: "",
+  showBuildingPicker: false,
+  inspector: "",
+  date: new Date().toISOString().slice(0, 10),
+  currentArea: null,
+  currentItemIdx: 0,
+  ratings: {},     // { areaKey: [ {rating, comment, photos:[] }, ... ] }
+  overallComments: "",
+  overallPhotos: [],
+  sheetsUrl: "",
+  showSettings: false,
+  submitting: false,
+  toast: null
+};
+
+// Initialize ratings
+AREA_KEYS.forEach(key => {
+  state.ratings[key] = CHECKLIST_DATA[key].en.map(() => ({ rating: 0, comment: "", photos: [] }));
+});
+
+function t(key) {
+  const keys = key.split(".");
+  let val = T[state.lang];
+  for (const k of keys) val = val?.[k];
+  return val || key;
+}
+
+// ══════════════════════════════════════════════════
+//  RENDER ENGINE
+// ══════════════════════════════════════════════════
+function render() {
+  const app = document.getElementById("app");
+  let html = renderHeader();
+
+  if (state.step === 1) html += renderStep1();
+  else if (state.step === 2 && state.currentArea) html += renderChecklist();
+  else if (state.step === 2) html += renderStep2();
+  else if (state.step === 3) html += renderStep3();
+  else if (state.step === 4) html += renderSuccess();
+
+  if (state.showSettings) html += renderSettings();
+  if (state.toast) html += `<div class="toast">${state.toast}</div>`;
+
+  app.innerHTML = html;
+  attachEvents();
+}
+
+function renderHeader() {
+  return `
+    <div class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        </div>
+        <div>
+          <div class="header-title">${t("appName")}</div>
+          <div class="header-sub">${t("appSub")}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="lang-toggle">
+          <button class="lang-btn ${state.lang==='en'?'active':''}" data-action="lang" data-val="en">EN</button>
+          <button class="lang-btn ${state.lang==='es'?'active':''}" data-action="lang" data-val="es">ES</button>
+        </div>
+        <button data-action="settings" style="padding:10px;background:none;border:none;cursor:pointer;">
+          <svg width="22" height="22" fill="none" stroke="#6b7280" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </button>
+      </div>
+    </div>
+    ${renderSteps()}
+  `;
+}
+
+function renderSteps() {
+  const s = state.step;
+  const labels = [t("step1"), t("step2"), t("step3")];
+  let html = '<div class="steps">';
+  for (let i = 1; i <= 3; i++) {
+    const cls = s > i ? "done" : s === i ? "active" : "";
+    html += `<div class="step-dot ${cls}">${s > i ? "✓" : i}</div>`;
+    if (i < 3) html += `<div class="step-line ${s > i ? "done" : ""}"></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+// ── Building Search Results ──
+function renderBuildingResults() {
+  const q = state.buildingSearch.toLowerCase().trim();
+  if (!q && !state.showBuildingPicker) return '';
+  // Filter buildings
+  let filtered = BUILDINGS;
+  if (q) {
+    filtered = BUILDINGS.filter(b =>
+      b.customer.toLowerCase().includes(q) ||
+      b.address.toLowerCase().includes(q)
+    );
+  }
+  if (filtered.length === 0) {
+    return `<div class="search-results"><div class="search-no-results">${t("buildingNoResults")}</div></div>`;
+  }
+  // Group by customer
+  let html = '<div class="search-results">';
+  let lastCust = "";
+  filtered.forEach((b, i) => {
+    if (b.customer !== lastCust) {
+      lastCust = b.customer;
+      html += `<div class="search-group-label">${b.customer}</div>`;
+    }
+    html += `<div class="search-result-item" data-action="selectBuilding" data-idx="${BUILDINGS.indexOf(b)}">
+      <div class="addr">${b.address}</div>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+// ── STEP 1: Audit Info ──
+function renderStep1() {
+  return `
+    <div class="container">
+      <div class="help-box">
+        <span class="icon">💡</span>
+        <span>${t("helpStep1")}</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📋</span> ${t("auditInfo")}</div>
+        <div class="form-group">
+          <label class="form-label">${t("buildingLabel")}</label>
+          ${state.building && !state.showBuildingPicker ? `
+            <div class="selected-building" data-action="openBuildingPicker">
+              <div>
+                <div class="sel-customer">✓ ${state.buildingCustomer}</div>
+                <div class="sel-address">${state.building}</div>
+              </div>
+              <div class="sel-change">${t("buildingChange")}</div>
+            </div>
+          ` : `
+            <div class="search-picker">
+              <div class="search-input-wrap">
+                <span class="search-icon">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="M21 21l-4.35-4.35"/></svg>
+                </span>
+                <input class="search-input" type="text" data-field="buildingSearch" placeholder="${t("buildingPlaceholder")}" value="${state.buildingSearch}" autocomplete="off">
+              </div>
+              ${renderBuildingResults()}
+            </div>
+          `}
+        </div>
+        <div class="form-group">
+          <label class="form-label">${t("inspectorLabel")}</label>
+          <select class="form-select" data-field="inspector">
+            <option value="">${t("inspectorPlaceholder")}</option>
+            ${["Facundo","Ingrid","Ramiro","Gio","Marlin"].map(n => `<option value="${n}" ${state.inspector===n?'selected':''}>${n}</option>`).join("")}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">${t("dateLabel")}</label>
+          <input class="form-input" type="date" data-field="date" value="${state.date}">
+        </div>
+      </div>
+      <button class="btn btn-primary" data-action="goStep2" ${!state.building||!state.inspector?'disabled':''}>
+        ${t("continue")} →
+      </button>
+    </div>
+  `;
+}
+
+// ── STEP 2: Area Selection ──
+function renderStep2() {
+  const totalItems = AREA_KEYS.reduce((s, k) => s + CHECKLIST_DATA[k].en.length, 0);
+  const ratedItems = AREA_KEYS.reduce((s, k) => s + state.ratings[k].filter(r => r.rating > 0).length, 0);
+  const pct = Math.round((ratedItems / totalItems) * 100);
+  const barColor = pct === 100 ? "var(--green)" : pct > 50 ? "var(--yellow)" : "var(--blue)";
+
+  return `
+    <div class="container">
+      <button class="btn-back" data-action="goStep1">← ${t("back")}</button>
+      <div class="help-box">
+        <span class="icon">👆</span>
+        <span>${t("helpStep2")}</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📊</span> ${t("progress")}</div>
+        <div class="progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}%;background:${barColor}"></div>
+          </div>
+          <div class="progress-label">
+            <span>${ratedItems} ${t("of")} ${totalItems} ${t("items")}</span>
+            <span>${pct}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-title mb-16"><span class="icon">🏠</span> ${t("selectArea")}</div>
+      <div class="area-grid">
+        ${AREA_KEYS.map(key => {
+          const items = CHECKLIST_DATA[key].en;
+          const rated = state.ratings[key].filter(r => r.rating > 0).length;
+          const total = items.length;
+          const isDone = rated === total;
+          const isStarted = rated > 0;
+          let statusText, statusCls, cardCls = "";
+          if (isDone) { statusText = t("complete"); statusCls = "done"; cardCls = "completed"; }
+          else if (isStarted) { statusText = `${rated}/${total}`; statusCls = "partial"; cardCls = "in-progress"; }
+          else { statusText = t("notStarted"); statusCls = "empty"; }
+          return `
+            <div class="area-card ${cardCls}" data-action="openArea" data-area="${key}">
+              ${isDone ? '<div class="area-badge">✓</div>' : ''}
+              <span class="area-icon">${AREA_ICONS[key]}</span>
+              <div class="area-name">${t("areas."+key)}</div>
+              <div class="area-status ${statusCls}">${statusText}</div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn btn-primary" data-action="goStep3" ${ratedItems===0?'disabled':''}>
+          ${t("reviewAudit")} →
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ── CHECKLIST (inside an area) ──
+function renderChecklist() {
+  const key = state.currentArea;
+  const idx = state.currentItemIdx;
+  const items = CHECKLIST_DATA[key][state.lang];
+  const total = items.length;
+  const r = state.ratings[key][idx];
+  const pct = Math.round(((idx + 1) / total) * 100);
+  const starLabels = [t("poor"), t("fair"), t("good"), t("vGood"), t("excellent")];
+
+  return `
+    <div class="container">
+      <button class="btn-back" data-action="closeArea">← ${t("back")} · ${t("areas."+key)}</button>
+      <div class="card">
+        <div class="progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}%;background:var(--blue)"></div>
+          </div>
+          <div class="progress-label">
+            <span>${t("item")} ${idx+1} ${t("of")} ${total}</span>
+            <span>${AREA_ICONS[key]} ${t("areas."+key)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="checklist-item ${r.rating >= 4 ? 'rated-good' : r.rating >= 3 ? 'rated-ok' : r.rating > 0 ? 'rated-bad' : ''}">
+        <div class="item-name">
+          <span class="item-number">${idx+1}</span>
+          ${items[idx]}
+        </div>
+        <div style="font-size:13px;color:var(--gray-400);margin-bottom:8px;font-weight:600">${t("rateItem")}</div>
+        <div class="stars">
+          ${[1,2,3,4,5].map(s => `
+            <div style="text-align:center">
+              <button class="star-btn ${s <= r.rating ? 'filled' : ''}" data-action="rate" data-val="${s}">
+                ${s <= r.rating ? '★' : '☆'}
+              </button>
+              <div class="star-label">${starLabels[s-1]}</div>
+            </div>
+          `).join("")}
+        </div>
+        <textarea class="comment-input" data-field="comment" placeholder="${t("addComment")}" rows="2">${r.comment}</textarea>
+        <label class="photo-btn" data-action="photoTrigger">
+          📷 ${t("addPhoto")}
+          <input type="file" accept="image/*" capture="environment" multiple data-action="addPhoto" style="display:none">
+        </label>
+        ${r.photos.length > 0 ? `
+          <div class="photo-grid">
+            ${r.photos.map((p, i) => `
+              <div class="photo-wrap">
+                <img src="${p.data}" class="photo-thumb">
+                <button class="photo-remove" data-action="removePhoto" data-idx="${i}">✕</button>
+              </div>
+            `).join("")}
+          </div>
+        ` : ''}
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" data-action="prevItem" ${idx===0?'disabled':''}>${t("prevItem")}</button>
+        ${idx < total - 1 ?
+          `<button class="btn btn-primary" data-action="nextItem">${t("nextItem")} →</button>` :
+          `<button class="btn btn-success" data-action="closeArea">✓ ${t("doneWithArea")}</button>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+// ── STEP 3: Review ──
+function renderStep3() {
+  const allRated = AREA_KEYS.flatMap(k => state.ratings[k]).filter(r => r.rating > 0);
+  const overall = allRated.length > 0 ? (allRated.reduce((s, r) => s + r.rating, 0) / allRated.length).toFixed(1) : "—";
+
+  return `
+    <div class="container">
+      <button class="btn-back" data-action="goStep2">← ${t("editAudit")}</button>
+      <div class="card text-center">
+        <div class="score-big">${overall}</div>
+        <div class="score-label">${t("overallScore")} / 5.0</div>
+        <div style="margin-top:6px;font-size:13px;color:var(--gray-400)">${state.buildingCustomer} — ${state.building}</div>
+        <div style="font-size:12px;color:var(--gray-400)">${state.inspector} · ${state.date}</div>
+      </div>
+      <div class="card">
+        ${AREA_KEYS.map(key => {
+          const items = CHECKLIST_DATA[key][state.lang];
+          const rs = state.ratings[key];
+          const rated = rs.filter(r => r.rating > 0);
+          const avg = rated.length > 0 ? (rated.reduce((s, r) => s + r.rating, 0) / rated.length).toFixed(1) : null;
+          let cls = "none";
+          if (avg >= 4) cls = "good"; else if (avg >= 3) cls = "ok"; else if (avg) cls = "bad";
+          return `
+            <div class="review-area">
+              <div class="review-area-header">
+                <div class="review-area-name">${AREA_ICONS[key]} ${t("areas."+key)}</div>
+                <div class="review-score ${cls}">${avg ? avg + '/5' : t("notRated")}</div>
+              </div>
+              <div class="review-items">
+                ${items.map((item, i) => {
+                  const r = rs[i];
+                  let badge = "", bgcls = "";
+                  if (r.rating >= 3) { badge = t("pass"); bgcls = "background:var(--green-light);color:var(--green);"; }
+                  else if (r.rating > 0) { badge = t("needsAttention"); bgcls = "background:var(--red-light);color:var(--red);"; }
+                  else { badge = t("notRated"); bgcls = "background:var(--gray-100);color:var(--gray-400);"; }
+                  return `<div class="review-item">
+                    <span style="flex:1">${item}${r.comment ? ' — <em style="color:var(--gray-400)">' + r.comment + '</em>' : ''}</span>
+                    <span class="review-item-badge" style="${bgcls}">${r.rating > 0 ? '★' + r.rating + ' ' : ''}${badge}</span>
+                  </div>`;
+                }).join("")}
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">💬</span> ${t("overallComments")}</div>
+        <textarea class="comment-input" data-field="overallComments" placeholder="${t("overallCommentsPlaceholder")}" rows="3">${state.overallComments}</textarea>
+        <div style="margin-top:12px">
+          <div style="font-size:13px;color:var(--gray-500);font-weight:600;margin-bottom:6px">${t("overallPhotos")}</div>
+          <label class="photo-btn" data-action="overallPhotoTrigger">
+            📷 ${t("addPhoto")}
+            <input type="file" accept="image/*" capture="environment" multiple data-action="addOverallPhoto" style="display:none">
+          </label>
+          ${state.overallPhotos.length > 0 ? `
+            <div class="photo-grid">
+              ${state.overallPhotos.map((p, i) => `
+                <div class="photo-wrap">
+                  <img src="${p.data}" class="photo-thumb">
+                  <button class="photo-remove" data-action="removeOverallPhoto" data-idx="${i}">✕</button>
+                </div>
+              `).join("")}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" data-action="downloadCSV">📥 ${t("downloadCSV")}</button>
+        <button class="btn btn-primary" data-action="submitSheets" ${state.submitting?'disabled':''}>
+          ${state.submitting ? t("submitting") : '📤 ' + t("submitToSheets")}
+        </button>
+      </div>
+      <div style="height:40px"></div>
+    </div>
+  `;
+}
+
+// ── SUCCESS ──
+function renderSuccess() {
+  return `
+    <div class="success-screen">
+      <div class="success-icon">✅</div>
+      <h2 style="font-size:24px;font-weight:800;margin-bottom:8px">${t("auditSubmitted")}</h2>
+      <p style="color:var(--gray-400);margin-bottom:4px">${state.buildingCustomer} — ${state.building}</p>
+      <p style="color:var(--gray-400);margin-bottom:32px">${state.inspector} · ${state.date}</p>
+      <button class="btn btn-primary" style="max-width:300px" data-action="reset">🔄 ${t("startNew")}</button>
+    </div>
+  `;
+}
+
+// ── SETTINGS MODAL ──
+function renderSettings() {
+  return `
+    <div class="modal-overlay" data-action="closeSettings">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-handle"></div>
+        <div class="card-title"><span class="icon">⚙️</span> ${t("settings")}</div>
+        <div class="form-group">
+          <label class="form-label">${t("sheetsUrl")}</label>
+          <input class="form-input" type="url" data-field="sheetsUrl" placeholder="https://script.google.com/macros/s/..." value="${state.sheetsUrl}">
+        </div>
+        <p class="text-muted mt-8">${t("sheetsHelp")}</p>
+        <div style="margin-top:20px">
+          <button class="btn btn-primary" data-action="closeSettings">${t("close")}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════
+//  EVENT HANDLING
+// ══════════════════════════════════════════════════
+function attachEvents() {
+  // Action buttons
+  document.querySelectorAll("[data-action]").forEach(el => {
+    const action = el.dataset.action;
+    if (action === "lang") {
+      el.onclick = () => { state.lang = el.dataset.val; render(); };
+    } else if (action === "settings") {
+      el.onclick = () => { state.showSettings = true; render(); };
+    } else if (action === "closeSettings") {
+      el.onclick = () => { state.showSettings = false; render(); };
+    } else if (action === "selectBuilding") {
+      el.onclick = () => {
+        const b = BUILDINGS[parseInt(el.dataset.idx)];
+        state.building = b.address;
+        state.buildingCustomer = b.customer;
+        state.buildingSearch = "";
+        state.showBuildingPicker = false;
+        render();
+        // Focus inspector input after selecting
+        setTimeout(() => {
+          const inp = document.querySelector('[data-field="inspector"]');
+          if (inp && !state.inspector) inp.focus();
+        }, 100);
+      };
+    } else if (action === "openBuildingPicker") {
+      el.onclick = () => {
+        state.showBuildingPicker = true;
+        state.buildingSearch = "";
+        render();
+        setTimeout(() => {
+          const inp = document.querySelector('[data-field="buildingSearch"]');
+          if (inp) inp.focus();
+        }, 100);
+      };
+    } else if (action === "goStep1") {
+      el.onclick = () => { state.step = 1; render(); };
+    } else if (action === "goStep2") {
+      el.onclick = () => { if (state.building && state.inspector) { state.step = 2; state.currentArea = null; render(); } };
+    } else if (action === "goStep3") {
+      el.onclick = () => { state.step = 3; render(); };
+    } else if (action === "openArea") {
+      el.onclick = () => { state.currentArea = el.dataset.area; state.currentItemIdx = 0; render(); };
+    } else if (action === "closeArea") {
+      el.onclick = () => { state.currentArea = null; render(); };
+    } else if (action === "rate") {
+      el.onclick = () => {
+        const val = parseInt(el.dataset.val);
+        state.ratings[state.currentArea][state.currentItemIdx].rating = val;
+        render();
+      };
+    } else if (action === "nextItem") {
+      el.onclick = () => {
+        const max = CHECKLIST_DATA[state.currentArea].en.length - 1;
+        if (state.currentItemIdx < max) { state.currentItemIdx++; render(); }
+      };
+    } else if (action === "prevItem") {
+      el.onclick = () => {
+        if (state.currentItemIdx > 0) { state.currentItemIdx--; render(); }
+      };
+    } else if (action === "photoTrigger" || action === "overallPhotoTrigger") {
+      // handled by label+input naturally
+    } else if (action === "addPhoto") {
+      el.onchange = (e) => {
+        Array.from(e.target.files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            state.ratings[state.currentArea][state.currentItemIdx].photos.push({ name: file.name, data: ev.target.result });
+            render();
+          };
+          reader.readAsDataURL(file);
+        });
+      };
+    } else if (action === "removePhoto") {
+      el.onclick = () => {
+        const i = parseInt(el.dataset.idx);
+        state.ratings[state.currentArea][state.currentItemIdx].photos.splice(i, 1);
+        render();
+      };
+    } else if (action === "addOverallPhoto") {
+      el.onchange = (e) => {
+        Array.from(e.target.files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            state.overallPhotos.push({ name: file.name, data: ev.target.result });
+            render();
+          };
+          reader.readAsDataURL(file);
+        });
+      };
+    } else if (action === "removeOverallPhoto") {
+      el.onclick = () => {
+        state.overallPhotos.splice(parseInt(el.dataset.idx), 1);
+        render();
+      };
+    } else if (action === "downloadCSV") {
+      el.onclick = downloadCSV;
+    } else if (action === "submitSheets") {
+      el.onclick = submitToSheets;
+    } else if (action === "reset") {
+      el.onclick = resetAll;
+    }
+  });
+
+  // Field inputs
+  document.querySelectorAll("[data-field]").forEach(el => {
+    const field = el.dataset.field;
+    const evtType = el.tagName === "SELECT" ? "change" : "input";
+    el.addEventListener(evtType, () => {
+      if (field === "comment") {
+        state.ratings[state.currentArea][state.currentItemIdx].comment = el.value;
+      } else if (field === "overallComments") {
+        state.overallComments = el.value;
+      } else if (field === "buildingSearch") {
+        state.buildingSearch = el.value;
+        render();
+        // Re-focus and restore cursor
+        setTimeout(() => {
+          const inp = document.querySelector('[data-field="buildingSearch"]');
+          if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+        }, 10);
+        return;
+      } else {
+        state[field] = el.value;
+      }
+      if (field === "inspector") render();
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  ACTIONS
+// ══════════════════════════════════════════════════
+function downloadCSV() {
+  let csv = "Timestamp,Customer,Building,Inspector,Date,Area,Item,Rating,Status,Comment,Photos\n";
+  AREA_KEYS.forEach(key => {
+    const items = CHECKLIST_DATA[key].en;
+    items.forEach((item, idx) => {
+      const r = state.ratings[key][idx];
+      const status = r.rating >= 3 ? "Pass" : r.rating > 0 ? "Needs Attention" : "Not Rated";
+      csv += [
+        new Date().toISOString(), `"${state.buildingCustomer}"`, `"${state.building}"`, `"${state.inspector}"`, state.date,
+        `"${key}"`, `"${item}"`, r.rating || "", status,
+        `"${r.comment.replace(/"/g, '""')}"`, r.photos.length
+      ].join(",") + "\n";
+    });
+  });
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `audit-${state.building.replace(/\s+/g, "-")}-${state.date}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(state.lang === "es" ? "CSV descargado" : "CSV downloaded");
+}
+
+async function submitToSheets() {
+  if (!state.sheetsUrl) {
+    showToast(state.lang === "es" ? "Configure la URL en Configuración" : "Set up URL in Settings");
+    return;
+  }
+  state.submitting = true; render();
+  const rows = [];
+  AREA_KEYS.forEach(key => {
+    CHECKLIST_DATA[key].en.forEach((item, idx) => {
+      const r = state.ratings[key][idx];
+      rows.push({
+        timestamp: new Date().toISOString(),
+        customer: state.buildingCustomer,
+        building: state.building,
+        inspector: state.inspector,
+        date: state.date,
+        area: key,
+        item: item,
+        rating: r.rating || "",
+        status: r.rating >= 3 ? "Pass" : r.rating > 0 ? "Needs Attention" : "Not Rated",
+        comment: r.comment,
+        photoCount: r.photos.length
+      });
+    });
+  });
+  try {
+    await fetch(state.sheetsUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rows, overallComments: state.overallComments, overallScore: calcOverall() })
+    });
+    state.submitting = false;
+    state.step = 4;
+    render();
+  } catch (e) {
+    state.submitting = false;
+    showToast(state.lang === "es" ? "Error al enviar. Verifique la URL." : "Error submitting. Check your URL.");
+    render();
+  }
+}
+
+function calcOverall() {
+  const rated = AREA_KEYS.flatMap(k => state.ratings[k]).filter(r => r.rating > 0);
+  return rated.length > 0 ? (rated.reduce((s, r) => s + r.rating, 0) / rated.length).toFixed(1) : "N/A";
+}
+
+function resetAll() {
+  state.step = 1;
+  state.building = "";
+  state.buildingCustomer = "";
+  state.buildingSearch = "";
+  state.showBuildingPicker = false;
+  state.inspector = "";
+  state.date = new Date().toISOString().slice(0, 10);
+  state.currentArea = null;
+  state.currentItemIdx = 0;
+  state.overallComments = "";
+  state.overallPhotos = [];
+  state.submitting = false;
+  AREA_KEYS.forEach(key => {
+    state.ratings[key] = CHECKLIST_DATA[key].en.map(() => ({ rating: 0, comment: "", photos: [] }));
+  });
+  render();
+}
+
+function showToast(msg) {
+  state.toast = msg;
+  render();
+  setTimeout(() => { state.toast = null; render(); }, 2500);
+}
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
